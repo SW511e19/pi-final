@@ -141,15 +141,27 @@ def classification():
         line = fp.readline()
         while line:
             line = fp.readline()
+            if "Artifact" in line:
+                print("of class Aartifact")
+                return "box_0"
+            if "Artifact Creature" in line:
+                print("of class Aartifact Creature")
+                return "box_1"
             if "Creature" in line:
                 print("This is a Creature")
-                if "Human Druid" in line:
-                    print("of class Human Druid")
-                return 1
+                return "box_2"
             if "Instant" in line:
                 print("This is an Instant Spell")
+                return "box_3"
             if "Sorcery" in line:
                 print("This is a Sorcery Spell")
+                return "box_4"
+            if "Enchantment" in line:
+                print("This is an Enchantment")
+                return "box_5"
+            if "Land" in line:
+                print("This is a Land")
+                return "box_6"
 
 while(True):
     print("in ready to receive")
