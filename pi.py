@@ -147,9 +147,7 @@ while(True):
     # Checking color of the card
     if (upcode == 3):
         print (" Assessing color")
-        clr_string = assesclr()
-        print ("Assessed color as :" + clr_string)
-        print(clr_string)
-        bytesToSend = str.encode(clr_string)
+        assescnc()
+        res = requests.get('http://127.0.0.1:5000/whichCard')
+        bytesToSend = str.encode(res.text)
         UDPServerSocket.sendto(bytesToSend, address)
-        print (" out of protocol")

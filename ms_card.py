@@ -47,16 +47,34 @@ def isCard():
         "not_card",
         "card"
     ]
+  return neural_assessment("model_structure_cnc.json", "model_weights_cnc.h5", class_label_names)
 
+
+
+@app.route('/whichCard')
+def whichCard():
+  class_label_names = [
+        "blue",
+        "red",
+        "green",
+        "black",
+        "white",
+        "multi",
+        "clrless"
+    ]
+  return neural_assessment("model_structure.json", "model_weights.h5", class_label_names)
+
+#If shit doesn't work, copy paste the code and replace parameters into iscard() and whichcard()
+def neural_assessment(model_structure, weights, class_label_names):
   # Load the json file that contains the model's structure
-  f = Path("model_structure_cnc.json")
+  f = Path(model_structure)
   model_structure = f.read_text()
 
   # Recreate the Keras model object from the json data
   model = model_from_json(model_structure)
 
   # Re-load the model's trained weights
-  model.load_weights("model_weights_cnc.h5")
+  model.load_weights(weights)
 
   # Load an image file to test, resizing it to 64x64 pixels (as required by this model)
   img = image.load_img("uploads/currentCard.png", target_size=(224, 224))
@@ -88,7 +106,3 @@ def isCard():
   class_label = class_label_names[most_likely_class_index]
   K.clear_session()
   return class_label
-
-@app.route('/whichCard')
-def whichCard():
-  return '1'
