@@ -63,6 +63,37 @@ def assescnc():
     # Re-load the model's trained weights
     model.load_weights("model_weights_cnc.h5")
 
+    return neural_prediction(model, image_path, class_label_names)
+    
+def assesclr():
+    image_path = "/home/pi/Desktop/cnc.png"
+    resizer(image_path, image_path)
+
+    class_label_names = [
+        "blue",
+        "red",
+        "green",
+        "black",
+        "white",
+        "multi",
+        "clrless"
+    ]
+
+    # Load the json file that contains the model's structure
+    f = Path("model_structure.json")
+    model_structure = f.read_text()
+
+    # Recreate the Keras model object from the json data
+    model = model_from_json(model_structure)
+
+    # Re-load the model's trained weights
+    model.load_weights("model_weights.h5")
+
+    return neural_prediction(model, image_path, class_label_names)
+
+#Code shared by both asses_cnc and asess_clr.
+#Copy this code into both functions if this doesn't work.
+def neural_prediction(model, image_path, class_label_names):
     # Load an image file to test, resizing it to 64x64 pixels (as required by this model)
     img = image.load_img(image_path, target_size=(224, 224))
     #img = image.load_img("green.png", target_size=(224, 224))
@@ -81,7 +112,7 @@ def assescnc():
 
     # Given the extracted features, make a final prediction using our own model
     results = model.predict(features)
-
+    
     # Since we are only testing one image with possible class, we only need to check the first result's first element
     single_result = results[0]
     
@@ -94,6 +125,7 @@ def assescnc():
     class_label = class_label_names[most_likely_class_index]
     print(class_label)
     return class_label
+
 
 assescnc()
 # Setting Up the Server Settings for Raspberry Pi
