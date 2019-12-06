@@ -13,10 +13,12 @@ msgFromClient = "READY"
 # Settings Up
 bytesToSend = str.encode(msgFromClient)
 bufferSize = 1024
-serverAddressPort = ("169.254.204.164", 22222) # IP and Port of the Raspberry PI
+piAddressPort = ("169.254.204.164", 22222) # IP and Port of the Raspberry PI
+ccAddressPort = ("169.254.xxx.xxx", 33333) # IP + Port of the CC EV3, change when it has an actual address
 
 # Create a UDP socket at client side
 UDPClientSocket = socket.socket(family = socket.AF_INET, type = socket.SOCK_DGRAM)
+ccUDPClientSocket = socket.socket(family = socket.AF_INET, type = socket.SOCK_DGRAM)
 
 # Set Postion of each Motor in Symboltable for global reference and updating.
 globals()['backPos'] = 0
@@ -87,7 +89,7 @@ def pushPiston(position):
 def checkCardPlacement():
     # Asks the Pi if there is card or not. Card:No_card
     # Timeout on 15 seconds
-    UDPClientSocket.sendto(bytesToSend, serverAddressPort)
+    UDPClientSocket.sendto(bytesToSend, piAddressPort)
     msgFromServer = UDPClientSocket.recvfrom(bufferSize)
     msg = "Card check upcode from the Rasberry Pi {}".format(msgFromServer[0])
     print(msg)
@@ -108,9 +110,10 @@ def getCardPlacement():
     msgFromClient = "REQUEST"
     bytesToSend = str.encode(msgFromClient)
     bufferSize = 1024
-    UDPClientSocket.sendto(bytesToSend, serverAddressPort)
+    UDPClientSocket.sendto(bytesToSend, piAddressPort)
     msgFromServer = UDPClientSocket.recvfrom(bufferSize)
-    msg = "Card check upcode from the Rasberry Pi {}".format(msgFromServer[0])
+    #msg = "Card check upcode from the Rasberry Pi {}".format(msgFromServer[0])
+    ccUDPClientSocket.sendto(msgFromServer, ccAddressPort) #No clue if this works, might be super scuffed lul
     print(msg)
 
 def positionCardCollector():

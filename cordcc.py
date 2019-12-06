@@ -10,24 +10,20 @@ m2 = LargeMotor(OUTPUT_C) # Cord has to go under the wheel
 
 global_speed = 25 # positive is left, negative is right
 
-BLUE = 1
-RED = 2
-GREEN = 3
-BLACK = 4
-WHITE = 5
-MULTI = 6
-CLRLESS = 7
+# Setting Up the Server Settings for EV3cc
+localIP     = "169.254.xxx.xxx"
+localPort   = 33333
+bufferSize  = 1024
 
-#Sets the READY message, which means that the ev3 is ready to communicate with the PI
-msgFromClient = "READY2"
+#Defining Attributes
+msgFromServer       = "This is sent from the server"
+bytesToSend         = str.encode(msgFromServer)
 
-# Settings Up
-bytesToSend = str.encode(msgFromClient)
-bufferSize = 1024
-serverAddressPort = ("169.254.204.164", 22222) # IP and Port of the Raspberry PI
+# Create a datagram socket
+UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 
-# Create a UDP socket at client side
-UDPClientSocket = socket.socket(family = socket.AF_INET, type = socket.SOCK_DGRAM)
+# Bind to address and ip
+UDPServerSocket.bind((localIP, localPort))
 
 # Runs the motors. Which motor starts first depends on the direction. The motor not pulling the CC begins 
 # First to loosen a little of the string the other motor can pull.
@@ -119,40 +115,34 @@ box_num = 1
 current_box = 0
 num_to_add = 1
 
-def awaitColor():
-    UDPClientSocket.sendto(bytesToSend, serverAddressPort)
-    msgFromServer = UDPClientSocket.recvfrom(bufferSize)
-    msg = "Card check upcode from the Rasberry Pi {}".format(msgFromServer[0])
-    print(msg)
-    if("blue" in msg):
-        return(BLUE)
-    if("red" in msg):
-        return(RED)
-    if("green" in msg):
-        return(GREEN)
-    if("black" in msg):
-        return(BLACK)
-    if("white" in msg):
-        return(WHITE)
-    if("multi" in msg):
-        return(MULTI)
-    if("clrless" in msg):
-        return(CLRLESS)
-    return 0
+def awaitBox():
+    while(True):
+        bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
 
-def awaitOCR():
-    # Asks the Pi if there is card or not. Card:No_card
-    # Timeout on 15 seconds
-    msgFromClient = "REQUEST"
-    bytesToSend = str.encode(msgFromClient)
-    bufferSize = 1024
-    UDPClientSocket.sendto(bytesToSend, serverAddressPort)
-    msgFromServer = UDPClientSocket.recvfrom(bufferSize)
-    msg = "Card check upcode from the Rasberry Pi {}".format(msgFromServer[0])
-    print(msg)
+        message = bytesAddressPair[0]
+        address = bytesAddressPair[1]
+        clientMsg = "Message from Client:{}".format(message)
+        clientIP  = "Client IP Address:{}".format(address)    
+        print(clientMsg)
+
+        if b"1" in message:
+            return 1
+        if b"2" in message:
+            return 2
+        if b"3" in message:
+            return 3
+        if b"4" in message:
+            return 4
+        if b"5" in message:
+            return 5
+        if b"6" in message:
+            return 6
+        if b"7" in message:
+            return 7
+
 
 while(True):
-    dest_box = awaitMessage()
+    dest_box = awaitBox()
     while current_box != dest_box:    
         current_box = go_to_box(current_box, box_num, global_speed)
         print("Went to box " + str(box_num))
