@@ -10,8 +10,16 @@ m2 = LargeMotor(OUTPUT_C) # Cord has to go under the wheel
 
 global_speed = 25 # positive is left, negative is right
 
+BLUE = 1
+RED = 2
+GREEN = 3
+BLACK = 4
+WHITE = 5
+MULTI = 6
+CLRLESS = 7
+
 #Sets the READY message, which means that the ev3 is ready to communicate with the PI
-msgFromClient = "READY"
+msgFromClient = "READY2"
 
 # Settings Up
 bytesToSend = str.encode(msgFromClient)
@@ -111,16 +119,45 @@ box_num = 1
 current_box = 0
 num_to_add = 1
 
+def awaitColor():
+    UDPClientSocket.sendto(bytesToSend, serverAddressPort)
+    msgFromServer = UDPClientSocket.recvfrom(bufferSize)
+    msg = "Card check upcode from the Rasberry Pi {}".format(msgFromServer[0])
+    print(msg)
+    if("blue" in msg):
+        return(BLUE)
+    if("red" in msg):
+        return(RED)
+    if("green" in msg):
+        return(GREEN)
+    if("black" in msg):
+        return(BLACK)
+    if("white" in msg):
+        return(WHITE)
+    if("multi" in msg):
+        return(MULTI)
+    if("clrless" in msg):
+        return(CLRLESS)
+    return 0
+
+def awaitOCR():
+    # Asks the Pi if there is card or not. Card:No_card
+    # Timeout on 15 seconds
+    msgFromClient = "REQUEST"
+    bytesToSend = str.encode(msgFromClient)
+    bufferSize = 1024
+    UDPClientSocket.sendto(bytesToSend, serverAddressPort)
+    msgFromServer = UDPClientSocket.recvfrom(bufferSize)
+    msg = "Card check upcode from the Rasberry Pi {}".format(msgFromServer[0])
+    print(msg)
+
 while(True):
-    current_box = go_to_box(current_box, box_num, global_speed)
-    print("Went to box " + str(box_num))
-    time.sleep(5)
-    if(box_num == 7):
-        num_to_add = -1
-    if(box_num == 1):
-        num_to_add = 1
-    box_num += num_to_add
-    
+    dest_box = awaitMessage()
+    while current_box != dest_box:    
+        current_box = go_to_box(current_box, box_num, global_speed)
+        print("Went to box " + str(box_num))
+        time.sleep(0.2)
+        
 #time.sleep(10)
 #current_box = go_to_box(current_box, 1, global_speed)
 

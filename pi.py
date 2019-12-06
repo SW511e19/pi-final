@@ -12,6 +12,8 @@ import requests
 import boto3
 
 globals()['upcode'] = 0
+globals()['boxlist'] = () #Da tuple lmao
+globals()['colNocr'] = 0
 
 def resizer(src, dest):
     im = Image.open(src)
@@ -49,6 +51,7 @@ def assescnc():
 
     resizer(image_path, image_path)
     
+    #Sends image to the server
     url = "http://127.0.0.1:5000"
     files = {'image': open(image_path, 'rb')}
     response = requests.request("POST", url, files=files)
@@ -88,7 +91,7 @@ def readyToReceive():
         if b"REQUEST" in message:
             globals()['upcode'] = 2
             break;
-        
+
         print(clientIP)
     return bytesAddressPair;
 
@@ -100,10 +103,10 @@ def classification():
         while line:
             line = fp.readline()
             if "Artifact" in line:
-                print("of class Aartifact")
+                print("of class Artifact")
                 return "box_0"
             if "Artifact Creature" in line:
-                print("of class Aartifact Creature")
+                print("of class Artifact Creature")
                 return "box_1"
             if "Creature" in line:
                 print("This is a Creature")
@@ -137,17 +140,18 @@ while(True):
     
     # Checking OCR of the card
     if (upcode == 2):
-        print (" Taking Picture")
-        ocr_image()
-        class_upcode = classification()
-        bytesToSend = str.encode(class_upcode)
-        UDPServerSocket.sendto(bytesToSend, address)
-        print (" out of protocol")
-
-    # Checking color of the card
-    if (upcode == 3):
-        print (" Assessing color")
-        assescnc()
-        res = requests.get('http://127.0.0.1:5000/whichCard')
-        bytesToSend = str.encode(res.text)
-        UDPServerSocket.sendto(bytesToSend, address)
+        if(colNocr == 0):
+            print (" Taking Picture")
+            ocr_image()
+            #class_upcode = classification()
+            box = box_list.index(res.text) #Might need ta change the ocr function for this to work lul
+            bytesToSend = str.encode(box)
+            UDPServerSocket.sendto(bytesToSend, address)
+            print (" out of protocol")
+        if(colNocr == 1):
+            print (" Assessing color")
+            assescnc()
+            res = requests.get('http://127.0.0.1:5000/whichCard')
+            box = box_list.index(res.text)
+            bytesToSend = str.encode(box)
+            UDPServerSocket.sendto(bytesToSend, address)
