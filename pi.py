@@ -220,3 +220,13 @@ while(True):
         bytesToSend = str.encode(class_upcode)
         UDPServerSocket.sendto(bytesToSend, address)
         print (" out of protocol")
+
+    # Checking color of the card
+    if (upcode == 3):
+        print (" Assessing color")
+        clr_string = assesclr()
+        print ("Assessed color as :" + clr_string)
+        print(clr_string)
+        bytesToSend = str.encode(clr_string)
+        UDPServerSocket.sendto(bytesToSend, address)
+        print (" out of protocol")
