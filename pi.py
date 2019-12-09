@@ -39,6 +39,7 @@ def hello():
 
     if request.method == 'POST':
         sort_type=request.form['sorttype']
+        globals()['colNocr'] = sort_type
         box1=request.form['box1']
         box2=request.form['box2']
         box3=request.form['box3']
@@ -46,8 +47,9 @@ def hello():
         box5=request.form['box5']
         box6=request.form['box6']
         box7=request.form['box7']
-
+        globals()['boxlist'] = (box1, box2, box3, box4, box5, box6, box7)
         flash('Sorting for: [{}] Box 1 : ({}),Box 2 : ({}), Box 3 : ({}), Box 4 : ({}), Box 5 : ({}), Box 6 : ({}), Box 7 : ({}),'.format(sort_type, box1, box2, box3, box4, box5, box6, box7))
+        
 
     return render_template('index.html', form=form)
 
