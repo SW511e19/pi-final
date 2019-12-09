@@ -11,7 +11,7 @@ m2 = LargeMotor(OUTPUT_C) # Cord has to go under the wheel
 global_speed = 25 # positive is left, negative is right
 
 # Setting Up the Server Settings for EV3cc
-localIP     = "169.254.xxx.xxx"
+localIP     = "169.254.142.115"
 localPort   = 33333
 bufferSize  = 1024
 
@@ -109,36 +109,38 @@ def go_to_box(current_box, dest_box, speed):
     stop_motor()
     return current_box
 
+print("Calibrating")
 calibrate() # Goes to the red line at the end of the machine before any boxes, position 0
-print("done calibrating")
+print("Done calibrating")
 box_num = 1
 current_box = 0
 num_to_add = 1
 
 def awaitBox():
-    while(True):
-        bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
+    print("Awaiting Connection")
+    bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
+    print("Connection Established")
 
-        message = bytesAddressPair[0]
-        address = bytesAddressPair[1]
-        clientMsg = "Message from Client:{}".format(message)
-        clientIP  = "Client IP Address:{}".format(address)    
-        print(clientMsg)
+    message = bytesAddressPair[0]
+    address = bytesAddressPair[1]
+    clientMsg = "Message from Client:{}".format(message)
+    clientIP  = "Client IP Address:{}".format(address)    
+    print(clientMsg)
 
-        if b"1" in message:
-            return 1
-        if b"2" in message:
-            return 2
-        if b"3" in message:
-            return 3
-        if b"4" in message:
-            return 4
-        if b"5" in message:
-            return 5
-        if b"6" in message:
-            return 6
-        if b"7" in message:
-            return 7
+    if b"1" in message:
+        return 1
+    if b"2" in message:
+        return 2
+    if b"3" in message:
+        return 3
+    if b"4" in message:
+        return 4
+    if b"5" in message:
+        return 5
+    if b"6" in message:
+        return 6
+    if b"7" in message:
+        return 7
 
 
 while(True):
