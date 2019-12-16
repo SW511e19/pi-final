@@ -22,6 +22,11 @@ def convert(list):
     return tuple(list)
 globals()['box_list'] = convert(a)
 
+# Splits the keywords into individual strings
+for entry in box_list:
+    entry = entry.split(" ")
+
+
 def resizer(src, dest):
     im = Image.open(src)
     im2 = im.resize((224, 224), Image.BICUBIC)
@@ -103,33 +108,26 @@ def readyToReceive():
     return bytesAddressPair;
 
 filepath = 'card.txt'
-
 def classification():
     with open(filepath) as fp:
-        line = fp.readline()
-        while line:
-            line = fp.readline()
-            if box_list[0] in line:
-                print("of class Artifact")
-                return 1
-            if box_list[1] in line:
-                print("of class Artifact Creature")
-                return 2
-            if box_list[2] in line:
-                print("This is a Creature")
-                return 3
-            if box_list[3] in line:
-                print("This is an Instant Spell")
-                return 4
-            if box_list[4] in line:
-                print("This is a Sorcery Spell")
-                return 5
-            if box_list[5] in line:
-                print("This is an Enchantment")
-                return 6
-            if box_list[6] in line:
-                print("This is a Land")
-                return 7
+        file = fp.read() # Contents of file saved as string
+        matches = []
+        keywords = 0
+        
+        # Iterate through every keyword and their subkeywords
+        for entry in box_list: 
+            for keyword in entry:
+                if keyword in file:
+                    keywords += 1
+                    
+                #Stops looking at a set of keywords if any are missing from text
+                else:
+                    break
+                
+                #Returns box number if a set of keywords match
+                if len(entry) == keywords:
+                    return box_list.index(entry)
+            keywords = 0
 
 while(True):
     print("in ready to receive")
