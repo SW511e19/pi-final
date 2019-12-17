@@ -107,8 +107,8 @@ def readyToReceive():
         print(clientIP)
     return bytesAddressPair;
 
-filepath = 'card.txt'
 def classification():
+    filepath = 'card.txt'
     with open(filepath) as fp:
         file = fp.read() # Contents of file saved as string
         matches = []
